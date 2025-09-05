@@ -7,6 +7,7 @@ import pandas_market_calendars as mcal
 import pandas as pd
 
 from data_store import DataStore
+from src.data.utils import parse_boolean_argument
 
 
 def main():
@@ -17,8 +18,7 @@ def main():
     ap.add_argument("--symbols", type=str, default=None, help="Comma-separated tickers")
     ap.add_argument("--columns", type=str, default=None, help="Comma-separated column list")
     ap.add_argument(
-        "--override",
-        action="store_true",
+        "--override", type=lambda s: parse_boolean_argument(s),
         default=False,
         help="If set, re-download and overwrite existing day files (default: False)",
     )
@@ -78,6 +78,7 @@ if __name__ == "__main__":
     sys.argv[1:] = [
         '--data-dir', r'/Users/fionaliu/Desktop/git/data',
         '--start', '20240101',
-        '--end', '20240110'
+        '--end', '20240110',
+        '--override', 'true'
     ]
     sys.exit(main())

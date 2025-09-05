@@ -14,3 +14,11 @@ def _norm_cols(df: pd.DataFrame) -> pd.DataFrame:
 def _biz_days(start: str, end: str) -> List[str]:
     rng = pd.date_range(start, end, freq="B")
     return [d.date().isoformat() for d in rng]
+
+def parse_boolean_argument(input):
+    input = str(input).lower()
+    if input in ['yes', 'true', '1']:
+        return True
+    if input in ['no', 'false', '0']:
+        return False
+    raise ValueError('Unsupported type for boolean argument')

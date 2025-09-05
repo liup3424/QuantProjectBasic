@@ -114,7 +114,7 @@ class DataStore:
                         progress=False,
                         session=self.session,
                         threads=False,
-                        timeout=30,
+                        timeout=3000,
                     )
                     if df.empty:
                         # nothing for this batch on this day (holiday etc.)
@@ -150,7 +150,7 @@ class DataStore:
                             rows.append(sub)
 
                     # polite tiny pause between batches to avoid burst
-                    time.sleep(0.15)
+                    time.sleep(5)
                     break  # success, leave retry loop
 
                 except yf.shared._exceptions.YFRateLimitError as e:  # type: ignore[attr-defined]

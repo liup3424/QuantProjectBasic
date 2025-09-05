@@ -34,5 +34,6 @@
 #             'WM', 'WAT', 'WEC', 'WFC', 'WELL', 'WST', 'WDC', 'WY', 'WSM', 'WMB', 'WTW', 'WDAY', 'WYNN', 'XEL', 'XYL', \
 #             'YUM', 'ZBRA', 'ZBH', 'ZTS']
 UNIVERSE: list[str] = ["AAPL", "MSFT", "GOOG", "AMZN"]
+# UNIVERSE: list[str] = ["^GSPC"]
 
 DEFAULT_COLUMNS: list[str] = ["open", "high", "low", "close", "adj_close", "volume"]

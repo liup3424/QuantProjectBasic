@@ -1,5 +1,13 @@
+"""
+Factor calculation module for quantitative trading strategies.
+"""
+
 import pandas as pd
 import numpy as np
+from typing import Dict, List, Optional
+
+from .alpha101_factors import Alpha101Calculator
+
 
 def compute_shadow_features(
     df: pd.DataFrame,
@@ -11,13 +19,36 @@ def compute_shadow_features(
     """
     Compute candlestick shadow and window-normalized features per code.
 
-    Adds columns:
-      vwap, upshadow, downshadow, up, down, up_mean, up_std, down_mean, down_std,
-      wm_up, wm_down, WM_up, WM_down, WM_up_mean, WM_up_std, WM_down_mean, WM_down_std
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input data with required columns: code, date, money, volume, high, low, open, close
+    code_col : str
+        Name of the security identifier column
+    date_col : str
+        Name of the date column
+    short_win : int
+        Short window for rolling calculations
+    long_win : int
+        Long window for rolling calculations
 
-    Notes:
-      - Rolling stats use min_periods = window (strict) to avoid early-window bias.
-      - Divisions by zero are guarded (result -> NaN).
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with added columns:
+        - vwap: Volume-weighted average price
+        - upshadow/downshadow: Raw shadow lengths
+        - up/down: Shadow lengths normalized by short MA
+        - up_mean/up_std/down_mean/down_std: Rolling stats over long window
+        - wm_up/wm_down: Wick measurements from close
+        - WM_* variants: Normalized wick measurements and their stats
+        - Alpha factors from Alpha101
+
+    Notes
+    -----
+    - Rolling stats use min_periods = window (strict) to avoid early-window bias
+    - Divisions by zero are handled gracefully (result -> NaN)
+    - Data is sorted by code and date before calculations
     """
     req_cols = {code_col, date_col, "money", "volume", "high", "low", "open", "close"}
     missing = req_cols - set(df.columns)
@@ -73,7 +104,19 @@ def compute_shadow_features(
     df["WM_down_mean"]= g["WM_down"].transform(lambda x: x.rolling(long_win, min_periods=long_win).mean())
     df["WM_down_std"] = g["WM_down"].transform(lambda x: x.rolling(long_win, min_periods=long_win).std())
 
+    # Calculate alpha factors
+    # First ensure we have the required columns
+    df['returns'] = g['close'].pct_change()  # Required for alpha calculations
+    alpha_calculator = Alpha101Calculator(df)
+    alpha_factors = alpha_calculator.calculate_all()
+    
+    # Convert alpha factors dictionary to DataFrame
+    alpha_df = pd.DataFrame(alpha_factors)
+    
+    # Combine features
+    result = pd.concat([df, alpha_df], axis=1)
+    
     # Clean up infinities from any divisions and keep NaN where undefined
-    df.replace([np.inf, -np.inf], np.nan, inplace=True)
+    result.replace([np.inf, -np.inf], np.nan, inplace=True)
 
-    return df
+    return result

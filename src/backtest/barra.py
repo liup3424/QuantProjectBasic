@@ -14,7 +14,7 @@ class NeutralizationProcessor:
     Per-date cross-sectional neutralization of factor columns against Barra controls.
 
     For each date/file shared by factor_path & barra_path:
-      1) Optionally winsorize each factor at mean ± 3σ (per cross section).
+      1) Optionally winsorize each factor at mean ± 3*std (per cross section).
       2) Optionally normalize each factor (mode: 1=min-max, 2=z-score, 3=magnitude).
       3) Regress y=factor on controls (barra columns) and take residuals as neutralized factor.
 
@@ -49,7 +49,7 @@ class NeutralizationProcessor:
         barra_cols : str | Iterable[str]
             Column(s) in Barra file used as controls.
         winsorize : bool
-            If True, clip each factor at mean ± 3σ per cross section.
+            If True, clip each factor at mean ± 3*std per cross section.
         use_tqdm : bool
             If True, show a progress bar.
         """

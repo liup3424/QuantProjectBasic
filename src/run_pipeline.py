@@ -62,6 +62,28 @@ class QuantPipeline:
         for d in [self.features_dir, self.neutral_dir, self.backtest_dir]:
             d.mkdir(parents=True, exist_ok=True)
 
+    @classmethod
+    def from_config(cls, cfg) -> "QuantPipeline":
+        """Build a QuantPipeline from a `PipelineConfig`-like object/dict.
+
+        Accepts the dataclass returned by `src.config_loader.load_config()` or
+        a similar object with the same attributes.
+        """
+        data_dir = str(cfg.data_dir)
+        output_dir = str(cfg.output_dir)
+        start_date = cfg.start_date
+        end_date = cfg.end_date
+        universe = None if getattr(cfg, "use_default_universe", True) else getattr(cfg, "custom_universe", None)
+        barra_factors = getattr(cfg, "barra_factors", None)
+        return cls(
+            data_dir=data_dir,
+            output_dir=output_dir,
+            start_date=start_date,
+            end_date=end_date,
+            universe=universe,
+            barra_factors=barra_factors,
+        )
+
     def load_market_data(self) -> None:
         """
         Load and prepare market data using DataStore.

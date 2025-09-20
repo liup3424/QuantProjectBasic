@@ -1,0 +1,33 @@
+# Pipeline configuration in YAML
+paths:
+  data_dir: "/Users/fionaliu/Desktop/git/data"
+  output_dir: "/Users/fionaliu/Desktop/git/output"
+
+dates:
+  start_date: "2024-01-01"
+  end_date: "2024-03-31"
+
+universe:
+  use_default_universe: true
+  custom_universe:
+    - "AAPL"
+    - "MSFT"
+    - "GOOG"
+    - "AMZN"
+
+barra:
+  factors:
+    - "size"
+    - "beta"
+    - "momentum"
+    - "volatility"
+
+backtest:
+  n_bins: 10
+  target_col: "return_1d"
+  code_col: "code"
+
+logging:
+  level: INFO
+  log_to_file: true
+  log_dir: "logs"
